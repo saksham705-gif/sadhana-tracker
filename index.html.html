@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Sadhana</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #1a1a2e; --primary-light: #2d2d44; --accent: #0066ff;
+            --bg: #f5f7fa; --card: #ffffff; --text: #1a1a1a; --text-light: #6b6b6b;
+            --border: #e1e4e8; --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg); color: var(--text); line-height: 1.6;
+            -webkit-font-smoothing: antialiased; padding: 20px;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .header {
+            background: var(--card); padding: 24px 32px; border-radius: 12px;
+            margin-bottom: 20px; box-shadow: var(--shadow); display: flex;
+            justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
+        }
+        .header-left h1 { font-size: 1.75rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+        .header-left p { font-size: 0.875rem; color: var(--text-light); font-weight: 400; }
+        .dashboard-btn {
+            background: var(--primary); color: white; padding: 12px 24px; border: none;
+            border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+            transition: all 0.3s ease; font-family: 'Inter', sans-serif;
+        }
+        .dashboard-btn:hover { background: var(--primary-light); transform: translateY(-1px); box-shadow: var(--shadow-hover); }
+        .form-card { background: var(--card); border-radius: 12px; padding: 32px; box-shadow: var(--shadow); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 20px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block; font-weight: 500; margin-bottom: 8px;
+            color: var(--text); font-size: 0.9rem;
+        }
+        input[type="date"], input[type="time"], input[type="number"],
+        input[type="text"], input[type="tel"], textarea {
+            width: 100%; padding: 10px 14px; border: 1px solid var(--border);
+            border-radius: 6px; font-size: 0.95rem; font-family: 'Inter', sans-serif;
+            transition: all 0.2s ease; background: var(--card); color: var(--text);
+        }
+        input:focus, textarea:focus {
+            outline: none; border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+        }
+        textarea { min-height: 100px; resize: vertical; }
+        .mood-buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+        .mood-btn {
+            padding: 10px 20px; background: var(--card); border: 1px solid var(--border);
+            border-radius: 20px; font-size: 0.9rem; font-weight: 500; cursor: pointer;
+            transition: all 0.2s ease; font-family: 'Inter', sans-serif; color: var(--text);
+        }
+        .mood-btn:hover { border-color: var(--accent); background: rgba(0, 102, 255, 0.05); }
+        .mood-btn.selected { background: var(--accent); color: white; border-color: var(--accent); }
+        .submit-btn {
+            width: 100%; padding: 14px; background: var(--accent); color: white;
+            border: none; border-radius: 8px; font-size: 1rem; font-weight: 600;
+            cursor: pointer; transition: all 0.3s ease; font-family: 'Inter', sans-serif;
+            margin-top: 24px;
+        }
+        .submit-btn:hover {
+            background: #0052cc; transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
+        }
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5); z-index: 1000; overflow-y: auto; padding: 20px;
+        }
+        .modal.active { display: flex; align-items: flex-start; justify-content: center; }
+        .modal-content {
+            background: var(--card); border-radius: 12px; padding: 32px;
+            max-width: 1200px; width: 100%; margin: 40px auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); animation: slideDown 0.3s ease;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;
+        }
+        .modal-header h2 { font-size: 1.5rem; font-weight: 700; color: var(--text); }
+        .close-btn {
+            background: var(--bg); border: none; font-size: 1.5rem; width: 36px;
+            height: 36px; border-radius: 50%; cursor: pointer; display: flex;
+            align-items: center; justify-content: center; color: var(--text-light);
+            transition: all 0.2s ease;
+        }
+        .close-btn:hover { background: var(--border); color: var(--text); }
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px; margin-bottom: 30px;
+        }
+        .stat-card { background: var(--bg); padding: 20px; border-radius: 10px; border: 1px solid var(--border); }
+        .stat-label { font-size: 0.85rem; color: var(--text-light); font-weight: 500; margin-bottom: 8px; }
+        .stat-value { font-size: 2rem; font-weight: 700; color: var(--accent); }
+        .entries-list { display: grid; gap: 16px; max-height: 500px; overflow-y: auto; }
+        .entry-card {
+            background: var(--bg); padding: 20px; border-radius: 10px;
+            border: 1px solid var(--border); transition: all 0.2s ease;
+        }
+        .entry-card:hover { border-color: var(--accent); box-shadow: var(--shadow-hover); }
+        .entry-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border);
+        }
+        .entry-date { font-size: 1.1rem; font-weight: 600; color: var(--text); }
+        .entry-name { font-size: 0.9rem; color: var(--text-light); }
+        .entry-details {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;
+        }
+        .detail-item { font-size: 0.9rem; }
+        .detail-label { color: var(--text-light); font-weight: 500; }
+        .detail-value { color: var(--text); font-weight: 600; }
+        .toast {
+            position: fixed; bottom: 24px; right: 24px; background: #10b981;
+            color: white; padding: 16px 24px; border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); font-weight: 600;
+            transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 2000;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .loading { text-align: center; padding: 40px; color: var(--text-light); }
+        .spinner {
+            width: 40px; height: 40px; border: 3px solid var(--border);
+            border-top-color: var(--accent); border-radius: 50%;
+            animation: spin 1s linear infinite; margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 768px) {
+            .header { padding: 20px; }
+            .header h1 { font-size: 1.5rem; }
+            .form-card { padding: 20px; }
+            .form-row { grid-template-columns: 1fr; gap: 16px; }
+            .modal-content { padding: 20px; margin: 20px auto; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .mood-buttons { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1>Daily Sadhana</h1>
+                <p>Mobile-friendly • Auto dashboard after submit</p>
+            </div>
+            <button class="dashboard-btn" onclick="openDashboard()">Open Dashboard</button>
+        </div>
+        <div class="form-card">
+            <form id="sadhanaForm">
+                <div class="form-row">
+                    <div class="form-group"><label for="date">Date</label><input type="date" id="date" required></div>
+                    <div class="form-group"><label for="name">Name</label><input type="text" id="name" placeholder="Your name" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label for="mobile">Mobile</label><input type="tel" id="mobile" placeholder="7045283601"></div>
+                    <div class="form-group"><label for="rounds">Rounds</label><input type="number" id="rounds" placeholder="Eg. 16" min="0" max="108"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label for="sleepTime">Sleep Time</label><input type="time" id="sleepTime"></div>
+                    <div class="form-group"><label for="wakeTime">Wake Time</label><input type="time" id="wakeTime"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label for="chantEndTime">Chant End Time</label><input type="time" id="chantEndTime"></div>
+                    <div class="form-group"><label for="exercise">Exercise (min)</label><input type="number" id="exercise" placeholder="Eg. 10" min="0"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label for="rest">Rest (min)</label><input type="number" id="rest" placeholder="Eg. 0" min="0"></div>
+                    <div class="form-group"><label for="hearingTopic">Hearing Topic</label><input type="text" id="hearingTopic" placeholder="Eg. Lectures"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label for="hearingMin">Hearing (min)</label><input type="number" id="hearingMin" placeholder="Eg. 60" min="0"></div>
+                    <div class="form-group"><label for="readingTopic">Reading Topic</label><input type="text" id="readingTopic" placeholder="Eg. Gyan ki Talwar"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label for="readingMin">Reading (min)</label><input type="number" id="readingMin" placeholder="Eg. 30" min="0"></div>
+                    <div class="form-group"><label for="seva">Seva</label><input type="text" id="seva" placeholder="Eg. Data manage"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label for="sevaMin">Seva (min)</label><input type="number" id="sevaMin" placeholder="Eg. 60" min="0"></div>
+                    <div class="form-group"><label for="positiveChetna">Positive Chetna</label><input type="text" id="positiveChetna" placeholder="Eg. Grateful"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label for="negativeChetna">Negative Chetna</label><input type="text" id="negativeChetna" placeholder="Eg. Distracted"></div>
+                    <div class="form-group">
+                        <label>Mood</label>
+                        <div class="mood-buttons" id="moodButtons">
+                            <button type="button" class="mood-btn" data-mood="Happy">Happy</button>
+                            <button type="button" class="mood-btn" data-mood="Peaceful">Peaceful</button>
+                            <button type="button" class="mood-btn" data-mood="Grateful">Grateful</button>
+                            <button type="button" class="mood-btn" data-mood="Neutral">Neutral</button>
+                            <button type="button" class="mood-btn" data-mood="Anxious">Anxious</button>
+                            <button type="button" class="mood-btn" data-mood="Tired">Tired</button>
+                            <button type="button" class="mood-btn" data-mood="Sad">Sad</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group"><label for="notes">Why / Notes</label><textarea id="notes" placeholder="Optional"></textarea></div>
+                <button type="submit" class="submit-btn">Submit</button>
+            </form>
+        </div>
+    </div>
+    <div id="dashboardModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Dashboard</h2>
+                <button class="close-btn" onclick="closeDashboard()">×</button>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-label">Total Entries</div><div class="stat-value" id="totalEntries">0</div></div>
+                <div class="stat-card"><div class="stat-label">Total Rounds</div><div class="stat-value" id="totalRounds">0</div></div>
+                <div class="stat-card"><div class="stat-label">Avg Rounds/Day</div><div class="stat-value" id="avgRounds">0</div></div>
+                <div class="stat-card"><div class="stat-label">Current Streak</div><div class="stat-value" id="currentStreak">0</div></div>
+            </div>
+            <div id="entriesContainer"><div class="loading"><div class="spinner"></div><p>Loading entries...</p></div></div>
+        </div>
+    </div>
+    <div id="toast" class="toast"></div>
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz5iLypXMxkmzghOr8FPc-stHY0jtWOusk7VQfSN5WF1LFOFyFK1E5wApU5ZELvNzlS/exec';
+        let selectedMood = '', allEntries = [];
+        document.getElementById('date').valueAsDate = new Date();
+        document.querySelectorAll('.mood-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedMood = this.getAttribute('data-mood');
+            });
+        });
+        document.getElementById('sadhanaForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = e.target.querySelector('.submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+            const formData = {
+                date: document.getElementById('date').value,
+                name: document.getElementById('name').value,
+                mobile: document.getElementById('mobile').value,
+                rounds: document.getElementById('rounds').value,
+                sleepTime: document.getElementById('sleepTime').value,
+                wakeTime: document.getElementById('wakeTime').value,
+                chantEndTime: document.getElementById('chantEndTime').value,
+                exercise: document.getElementById('exercise').value,
+                rest: document.getElementById('rest').value,
+                hearingTopic: document.getElementById('hearingTopic').value,
+                hearingMin: document.getElementById('hearingMin').value,
+                readingTopic: document.getElementById('readingTopic').value,
+                readingMin: document.getElementById('readingMin').value,
+                seva: document.getElementById('seva').value,
+                sevaMin: document.getElementById('sevaMin').value,
+                positiveChetna: document.getElementById('positiveChetna').value,
+                negativeChetna: document.getElementById('negativeChetna').value,
+                mood: selectedMood,
+                notes: document.getElementById('notes').value,
+                timestamp: new Date().toISOString()
+            };
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    redirect: 'follow',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify(formData)
+                });
+                if (response.ok) {
+                    showToast('✅ Entry submitted successfully!');
+                    document.getElementById('sadhanaForm').reset();
+                    document.getElementById('date').valueAsDate = new Date();
+                    selectedMood = '';
+                    document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+                    setTimeout(() => openDashboard(), 1500);
+                } else {
+                    throw new Error('Submission failed');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('✅ Entry submitted! Check your Google Sheet.');
+                document.getElementById('sadhanaForm').reset();
+                document.getElementById('date').valueAsDate = new Date();
+                selectedMood = '';
+                document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+                setTimeout(() => openDashboard(), 1500);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit';
+            }
+        });
+        function openDashboard() {
+            document.getElementById('dashboardModal').classList.add('active');
+            loadDashboard();
+        }
+        function closeDashboard() {
+            document.getElementById('dashboardModal').classList.remove('active');
+        }
+        async function loadDashboard() {
+            const container = document.getElementById('entriesContainer');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading entries...</p></div>';
+            try {
+                const response = await fetch(SCRIPT_URL + '?action=getData');
+                const data = await response.json();
+                if (data.entries && data.entries.length > 0) {
+                    allEntries = data.entries;
+                    displayEntries(allEntries);
+                    updateStats(allEntries);
+                } else {
+                    container.innerHTML = '<div class="loading"><p>No entries yet. Submit your first entry!</p></div>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                container.innerHTML = '<div class="loading"><p>Unable to load entries. Please try again.</p></div>';
+            }
+        }
+        function displayEntries(entries) {
+            const container = document.getElementById('entriesContainer');
+            if (entries.length === 0) {
+                container.innerHTML = '<div class="loading"><p>No entries found.</p></div>';
+                return;
+            }
+            container.innerHTML = '<div class="entries-list">' + 
+                entries.map(entry => `
+                    <div class="entry-card">
+                        <div class="entry-header">
+                            <div><div class="entry-date">${formatDate(entry.date)}</div><div class="entry-name">${entry.name}</div></div>
+                            <div style="text-align: right;"><div style="font-weight: 600; color: var(--accent);">${entry.rounds} Rounds</div>
+                            ${entry.mood ? `<div style="font-size: 0.85rem; color: var(--text-light); margin-top: 4px;">${entry.mood}</div>` : ''}</div>
+                        </div>
+                        <div class="entry-details">
+                            ${entry.mobile ? `<div class="detail-item"><span class="detail-label">Mobile:</span> <span class="detail-value">${entry.mobile}</span></div>` : ''}
+                            ${entry.sleepTime ? `<div class="detail-item"><span class="detail-label">Sleep:</span> <span class="detail-value">${entry.sleepTime}</span></div>` : ''}
+                            ${entry.wakeTime ? `<div class="detail-item"><span class="detail-label">Wake:</span> <span class="detail-value">${entry.wakeTime}</span></div>` : ''}
+                            ${entry.chantEndTime ? `<div class="detail-item"><span class="detail-label">Chant End:</span> <span class="detail-value">${entry.chantEndTime}</span></div>` : ''}
+                            ${entry.exercise ? `<div class="detail-item"><span class="detail-label">Exercise:</span> <span class="detail-value">${entry.exercise} min</span></div>` : ''}
+                            ${entry.rest ? `<div class="detail-item"><span class="detail-label">Rest:</span> <span class="detail-value">${entry.rest} min</span></div>` : ''}
+                            ${entry.hearingTopic ? `<div class="detail-item"><span class="detail-label">Hearing:</span> <span class="detail-value">${entry.hearingTopic} (${entry.hearingMin || 0} min)</span></div>` : ''}
+                            ${entry.readingTopic ? `<div class="detail-item"><span class="detail-label">Reading:</span> <span class="detail-value">${entry.readingTopic} (${entry.readingMin || 0} min)</span></div>` : ''}
+                            ${entry.seva ? `<div class="detail-item"><span class="detail-label">Seva:</span> <span class="detail-value">${entry.seva} (${entry.sevaMin || 0} min)</span></div>` : ''}
+                            ${entry.positiveChetna ? `<div class="detail-item"><span class="detail-label">Positive:</span> <span class="detail-value">${entry.positiveChetna}</span></div>` : ''}
+                            ${entry.negativeChetna ? `<div class="detail-item"><span class="detail-label">Negative:</span> <span class="detail-value">${entry.negativeChetna}</span></div>` : ''}
+                        </div>
+                        ${entry.notes ? `<div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 0.9rem; color: var(--text-light);">${entry.notes}</div>` : ''}
+                    </div>
+                `).join('') +
+            '</div>';
+        }
+        function updateStats(entries) {
+            const totalEntries = entries.length;
+            const totalRounds = entries.reduce((sum, entry) => sum + (parseInt(entry.rounds) || 0), 0);
+            const avgRounds = totalEntries > 0 ? Math.round(totalRounds / totalEntries) : 0;
+            const sortedDates = entries.map(e => new Date(e.date)).sort((a, b) => b - a);
+            let streak = 0, currentDate = new Date();
+            currentDate.setHours(0, 0, 0, 0);
+            for (let date of sortedDates) {
+                date.setHours(0, 0, 0, 0);
+                const diffDays = Math.floor((currentDate - date) / (1000 * 60 * 60 * 24));
+                if (diffDays === streak) { streak++; currentDate = new Date(date); } else { break; }
+            }
+            document.getElementById('totalEntries').textContent = totalEntries;
+            document.getElementById('totalRounds').textContent = totalRounds;
+            document.getElementById('avgRounds').textContent = avgRounds;
+            document.getElementById('currentStreak').textContent = streak;
+        }
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+        }
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+        document.getElementById('dashboardModal').addEventListener('click', function(e) {
+            if (e.target === this) closeDashboard();
+        });
+    </script>
+</body>
+</html>
