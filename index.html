@@ -3,383 +3,789 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Sadhana</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Sadhana Tracker - Role Based System</title>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.10.3/Recharts.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --primary: #1a1a2e; --primary-light: #2d2d44; --accent: #0066ff;
-            --bg: #f5f7fa; --card: #ffffff; --text: #1a1a1a; --text-light: #6b6b6b;
-            --border: #e1e4e8; --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-            --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg); color: var(--text); line-height: 1.6;
-            -webkit-font-smoothing: antialiased; padding: 20px;
-        }
-        .container { max-width: 1000px; margin: 0 auto; }
-        .header {
-            background: var(--card); padding: 24px 32px; border-radius: 12px;
-            margin-bottom: 20px; box-shadow: var(--shadow); display: flex;
-            justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
-        }
-        .header-left h1 { font-size: 1.75rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-        .header-left p { font-size: 0.875rem; color: var(--text-light); font-weight: 400; }
-        .dashboard-btn {
-            background: var(--primary); color: white; padding: 12px 24px; border: none;
-            border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer;
-            transition: all 0.3s ease; font-family: 'Inter', sans-serif;
-        }
-        .dashboard-btn:hover { background: var(--primary-light); transform: translateY(-1px); box-shadow: var(--shadow-hover); }
-        .form-card { background: var(--card); border-radius: 12px; padding: 32px; box-shadow: var(--shadow); }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 20px; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label {
-            display: block; font-weight: 500; margin-bottom: 8px;
-            color: var(--text); font-size: 0.9rem;
-        }
-        input[type="date"], input[type="time"], input[type="number"],
-        input[type="text"], input[type="tel"], textarea {
-            width: 100%; padding: 10px 14px; border: 1px solid var(--border);
-            border-radius: 6px; font-size: 0.95rem; font-family: 'Inter', sans-serif;
-            transition: all 0.2s ease; background: var(--card); color: var(--text);
-        }
-        input:focus, textarea:focus {
-            outline: none; border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
-        }
-        textarea { min-height: 100px; resize: vertical; }
-        .mood-buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
-        .mood-btn {
-            padding: 10px 20px; background: var(--card); border: 1px solid var(--border);
-            border-radius: 20px; font-size: 0.9rem; font-weight: 500; cursor: pointer;
-            transition: all 0.2s ease; font-family: 'Inter', sans-serif; color: var(--text);
-        }
-        .mood-btn:hover { border-color: var(--accent); background: rgba(0, 102, 255, 0.05); }
-        .mood-btn.selected { background: var(--accent); color: white; border-color: var(--accent); }
-        .submit-btn {
-            width: 100%; padding: 14px; background: var(--accent); color: white;
-            border: none; border-radius: 8px; font-size: 1rem; font-weight: 600;
-            cursor: pointer; transition: all 0.3s ease; font-family: 'Inter', sans-serif;
-            margin-top: 24px;
-        }
-        .submit-btn:hover {
-            background: #0052cc; transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
-        }
-        .modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.5); z-index: 1000; overflow-y: auto; padding: 20px;
-        }
-        .modal.active { display: flex; align-items: flex-start; justify-content: center; }
-        .modal-content {
-            background: var(--card); border-radius: 12px; padding: 32px;
-            max-width: 1200px; width: 100%; margin: 40px auto;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); animation: slideDown 0.3s ease;
-        }
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .modal-header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;
-        }
-        .modal-header h2 { font-size: 1.5rem; font-weight: 700; color: var(--text); }
-        .close-btn {
-            background: var(--bg); border: none; font-size: 1.5rem; width: 36px;
-            height: 36px; border-radius: 50%; cursor: pointer; display: flex;
-            align-items: center; justify-content: center; color: var(--text-light);
-            transition: all 0.2s ease;
-        }
-        .close-btn:hover { background: var(--border); color: var(--text); }
-        .stats-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px; margin-bottom: 30px;
-        }
-        .stat-card { background: var(--bg); padding: 20px; border-radius: 10px; border: 1px solid var(--border); }
-        .stat-label { font-size: 0.85rem; color: var(--text-light); font-weight: 500; margin-bottom: 8px; }
-        .stat-value { font-size: 2rem; font-weight: 700; color: var(--accent); }
-        .entries-list { display: grid; gap: 16px; max-height: 500px; overflow-y: auto; }
-        .entry-card {
-            background: var(--bg); padding: 20px; border-radius: 10px;
-            border: 1px solid var(--border); transition: all 0.2s ease;
-        }
-        .entry-card:hover { border-color: var(--accent); box-shadow: var(--shadow-hover); }
-        .entry-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border);
-        }
-        .entry-date { font-size: 1.1rem; font-weight: 600; color: var(--text); }
-        .entry-name { font-size: 0.9rem; color: var(--text-light); }
-        .entry-details {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;
-        }
-        .detail-item { font-size: 0.9rem; }
-        .detail-label { color: var(--text-light); font-weight: 500; }
-        .detail-value { color: var(--text); font-weight: 600; }
-        .toast {
-            position: fixed; bottom: 24px; right: 24px; background: #10b981;
-            color: white; padding: 16px 24px; border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); font-weight: 600;
-            transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 2000;
-        }
-        .toast.show { transform: translateY(0); opacity: 1; }
-        .loading { text-align: center; padding: 40px; color: var(--text-light); }
-        .spinner {
-            width: 40px; height: 40px; border: 3px solid var(--border);
-            border-top-color: var(--accent); border-radius: 50%;
-            animation: spin 1s linear infinite; margin: 0 auto 16px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @media (max-width: 768px) {
-            .header { padding: 20px; }
-            .header h1 { font-size: 1.5rem; }
-            .form-card { padding: 20px; }
-            .form-row { grid-template-columns: 1fr; gap: 16px; }
-            .modal-content { padding: 20px; margin: 20px auto; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .mood-buttons { grid-template-columns: repeat(2, 1fr); }
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="header-left">
-                <h1>Daily Sadhana</h1>
-                <p>Mobile-friendly • Auto dashboard after submit</p>
-            </div>
-            <button class="dashboard-btn" onclick="openDashboard()">Open Dashboard</button>
-        </div>
-        <div class="form-card">
-            <form id="sadhanaForm">
-                <div class="form-row">
-                    <div class="form-group"><label for="date">Date</label><input type="date" id="date" required></div>
-                    <div class="form-group"><label for="name">Name</label><input type="text" id="name" placeholder="Your name" required></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label for="mobile">Mobile</label><input type="tel" id="mobile" placeholder="7045283601"></div>
-                    <div class="form-group"><label for="rounds">Rounds</label><input type="number" id="rounds" placeholder="Eg. 16" min="0" max="108"></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label for="sleepTime">Sleep Time</label><input type="time" id="sleepTime"></div>
-                    <div class="form-group"><label for="wakeTime">Wake Time</label><input type="time" id="wakeTime"></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label for="chantEndTime">Chant End Time</label><input type="time" id="chantEndTime"></div>
-                    <div class="form-group"><label for="exercise">Exercise (min)</label><input type="number" id="exercise" placeholder="Eg. 10" min="0"></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label for="rest">Rest (min)</label><input type="number" id="rest" placeholder="Eg. 0" min="0"></div>
-                    <div class="form-group"><label for="hearingTopic">Hearing Topic</label><input type="text" id="hearingTopic" placeholder="Eg. Lectures"></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label for="hearingMin">Hearing (min)</label><input type="number" id="hearingMin" placeholder="Eg. 60" min="0"></div>
-                    <div class="form-group"><label for="readingTopic">Reading Topic</label><input type="text" id="readingTopic" placeholder="Eg. Gyan ki Talwar"></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label for="readingMin">Reading (min)</label><input type="number" id="readingMin" placeholder="Eg. 30" min="0"></div>
-                    <div class="form-group"><label for="seva">Seva</label><input type="text" id="seva" placeholder="Eg. Data manage"></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label for="sevaMin">Seva (min)</label><input type="number" id="sevaMin" placeholder="Eg. 60" min="0"></div>
-                    <div class="form-group"><label for="positiveChetna">Positive Chetna</label><input type="text" id="positiveChetna" placeholder="Eg. Grateful"></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label for="negativeChetna">Negative Chetna</label><input type="text" id="negativeChetna" placeholder="Eg. Distracted"></div>
-                    <div class="form-group">
-                        <label>Mood</label>
-                        <div class="mood-buttons" id="moodButtons">
-                            <button type="button" class="mood-btn" data-mood="Happy">Happy</button>
-                            <button type="button" class="mood-btn" data-mood="Peaceful">Peaceful</button>
-                            <button type="button" class="mood-btn" data-mood="Grateful">Grateful</button>
-                            <button type="button" class="mood-btn" data-mood="Neutral">Neutral</button>
-                            <button type="button" class="mood-btn" data-mood="Anxious">Anxious</button>
-                            <button type="button" class="mood-btn" data-mood="Tired">Tired</button>
-                            <button type="button" class="mood-btn" data-mood="Sad">Sad</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group"><label for="notes">Why / Notes</label><textarea id="notes" placeholder="Optional"></textarea></div>
-                <button type="submit" class="submit-btn">Submit</button>
-            </form>
-        </div>
-    </div>
-    <div id="dashboardModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Dashboard</h2>
-                <button class="close-btn" onclick="closeDashboard()">×</button>
-            </div>
-            <div class="stats-grid">
-                <div class="stat-card"><div class="stat-label">Total Entries</div><div class="stat-value" id="totalEntries">0</div></div>
-                <div class="stat-card"><div class="stat-label">Total Rounds</div><div class="stat-value" id="totalRounds">0</div></div>
-                <div class="stat-card"><div class="stat-label">Avg Rounds/Day</div><div class="stat-value" id="avgRounds">0</div></div>
-                <div class="stat-card"><div class="stat-label">Current Streak</div><div class="stat-value" id="currentStreak">0</div></div>
-            </div>
-            <div id="entriesContainer"><div class="loading"><div class="spinner"></div><p>Loading entries...</p></div></div>
-        </div>
-    </div>
-    <div id="toast" class="toast"></div>
-    <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz5iLypXMxkmzghOr8FPc-stHY0jtWOusk7VQfSN5WF1LFOFyFK1E5wApU5ZELvNzlS/exec';
-        let selectedMood = '', allEntries = [];
-        document.getElementById('date').valueAsDate = new Date();
-        document.querySelectorAll('.mood-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
-                this.classList.add('selected');
-                selectedMood = this.getAttribute('data-mood');
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } = Recharts;
+
+        // ========================================
+        // CONFIGURATION - EDIT THIS SECTION ONLY
+        // ========================================
+        
+        // ADMIN CREDENTIALS - Change these!
+        const ADMIN_USERNAME = 'admin';
+        const ADMIN_PASSWORD = 'admin123';
+        
+        // List of mentors - Add or remove as needed
+        const MENTOR_LIST = [
+            'Giridhar Sevak Das Prabhuji',
+            'Krishna Priya Mataji',
+            'Radha Vallabh Das Prabhuji',
+            'Govind Das Prabhuji',
+            'Gauranga Das Prabhuji',
+            'Other'
+        ];
+
+        // ========================================
+        // END OF CONFIGURATION
+        // ========================================
+
+        // Icon Components
+        const User = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+        );
+
+        const Lock = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+        );
+
+        const LogOut = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+        );
+
+        const Calendar = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+        );
+
+        const Award = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+            </svg>
+        );
+
+        const TrendingUp = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+        );
+
+        const Users = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+        );
+
+        const UserCircle = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        );
+
+        const UserPlus = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+            </svg>
+        );
+
+        const SadhanaTracker = () => {
+            const [currentUser, setCurrentUser] = useState(null);
+            const [showMentorSelection, setShowMentorSelection] = useState(false);
+            const [showRegister, setShowRegister] = useState(false);
+            const [loginForm, setLoginForm] = useState({ username: '', password: '' });
+            const [registerForm, setRegisterForm] = useState({ 
+                name: '', 
+                username: '', 
+                password: '',
+                confirmPassword: ''
             });
-        });
-        document.getElementById('sadhanaForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const submitBtn = e.target.querySelector('.submit-btn');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Submitting...';
-            const formData = {
-                date: document.getElementById('date').value,
-                name: document.getElementById('name').value,
-                mobile: document.getElementById('mobile').value,
-                rounds: document.getElementById('rounds').value,
-                sleepTime: document.getElementById('sleepTime').value,
-                wakeTime: document.getElementById('wakeTime').value,
-                chantEndTime: document.getElementById('chantEndTime').value,
-                exercise: document.getElementById('exercise').value,
-                rest: document.getElementById('rest').value,
-                hearingTopic: document.getElementById('hearingTopic').value,
-                hearingMin: document.getElementById('hearingMin').value,
-                readingTopic: document.getElementById('readingTopic').value,
-                readingMin: document.getElementById('readingMin').value,
-                seva: document.getElementById('seva').value,
-                sevaMin: document.getElementById('sevaMin').value,
-                positiveChetna: document.getElementById('positiveChetna').value,
-                negativeChetna: document.getElementById('negativeChetna').value,
-                mood: selectedMood,
-                notes: document.getElementById('notes').value,
-                timestamp: new Date().toISOString()
+            const [sadhanaForm, setSadhanaForm] = useState({
+                date: new Date().toISOString().split('T')[0],
+                japaRounds: '',
+                reading: '',
+                service: '',
+                attendance: false
+            });
+            const [sadhanaData, setSadhanaData] = useState([]);
+            const [userProfiles, setUserProfiles] = useState({});
+            const [devoteeAccounts, setDevoteeAccounts] = useState({});
+
+            useEffect(() => {
+                const stored = localStorage.getItem('sadhanaEntries');
+                const profiles = localStorage.getItem('userProfiles');
+                const accounts = localStorage.getItem('devoteeAccounts');
+                
+                if (stored) setSadhanaData(JSON.parse(stored));
+                if (profiles) setUserProfiles(JSON.parse(profiles));
+                if (accounts) setDevoteeAccounts(JSON.parse(accounts));
+            }, []);
+
+            const handleRegister = () => {
+                if (!registerForm.name || !registerForm.username || !registerForm.password) {
+                    alert('Please fill all fields');
+                    return;
+                }
+
+                if (registerForm.password !== registerForm.confirmPassword) {
+                    alert('Passwords do not match');
+                    return;
+                }
+
+                if (registerForm.username === ADMIN_USERNAME) {
+                    alert('This username is reserved. Please choose another.');
+                    return;
+                }
+
+                if (devoteeAccounts[registerForm.username]) {
+                    alert('Username already exists. Please choose another.');
+                    return;
+                }
+
+                const newAccounts = {
+                    ...devoteeAccounts,
+                    [registerForm.username]: {
+                        name: registerForm.name,
+                        password: registerForm.password,
+                        createdAt: new Date().toISOString()
+                    }
+                };
+
+                setDevoteeAccounts(newAccounts);
+                localStorage.setItem('devoteeAccounts', JSON.stringify(newAccounts));
+
+                alert('Registration successful! Please login with your credentials.');
+                setShowRegister(false);
+                setRegisterForm({ name: '', username: '', password: '', confirmPassword: '' });
             };
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    redirect: 'follow',
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: JSON.stringify(formData)
+
+            const handleLogin = (e) => {
+                e.preventDefault();
+                
+                // Check if admin
+                if (loginForm.username === ADMIN_USERNAME && loginForm.password === ADMIN_PASSWORD) {
+                    setCurrentUser({ username: ADMIN_USERNAME, role: 'admin', name: 'Admin' });
+                    setShowMentorSelection(false);
+                    setLoginForm({ username: '', password: '' });
+                    return;
+                }
+
+                // Check if devotee
+                const devotee = devoteeAccounts[loginForm.username];
+                if (devotee && devotee.password === loginForm.password) {
+                    const user = {
+                        username: loginForm.username,
+                        role: 'devotee',
+                        name: devotee.name
+                    };
+
+                    if (!userProfiles[loginForm.username]) {
+                        setCurrentUser(user);
+                        setShowMentorSelection(true);
+                    } else {
+                        setCurrentUser(user);
+                        setShowMentorSelection(false);
+                    }
+                    setLoginForm({ username: '', password: '' });
+                } else {
+                    alert('Invalid credentials');
+                }
+            };
+
+            const handleMentorSelection = (mentor) => {
+                const updatedProfiles = {
+                    ...userProfiles,
+                    [currentUser.username]: {
+                        mentor,
+                        selectedAt: new Date().toISOString()
+                    }
+                };
+                setUserProfiles(updatedProfiles);
+                localStorage.setItem('userProfiles', JSON.stringify(updatedProfiles));
+                setShowMentorSelection(false);
+            };
+
+            const handleLogout = () => {
+                setCurrentUser(null);
+                setShowMentorSelection(false);
+            };
+
+            const handleSadhanaSubmit = () => {
+                if (!sadhanaForm.japaRounds || !sadhanaForm.reading) {
+                    alert('Please fill Japa Rounds and Reading time');
+                    return;
+                }
+
+                const newEntry = {
+                    ...sadhanaForm,
+                    id: Date.now(),
+                    username: currentUser.username,
+                    devotee: currentUser.name,
+                    mentor: userProfiles[currentUser.username]?.mentor || 'Not Selected',
+                    submittedAt: new Date().toISOString()
+                };
+                
+                const updated = [...sadhanaData, newEntry];
+                setSadhanaData(updated);
+                localStorage.setItem('sadhanaEntries', JSON.stringify(updated));
+                
+                setSadhanaForm({
+                    date: new Date().toISOString().split('T')[0],
+                    japaRounds: '',
+                    reading: '',
+                    service: '',
+                    attendance: false
                 });
-                if (response.ok) {
-                    showToast('✅ Entry submitted successfully!');
-                    document.getElementById('sadhanaForm').reset();
-                    document.getElementById('date').valueAsDate = new Date();
-                    selectedMood = '';
-                    document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
-                    setTimeout(() => openDashboard(), 1500);
-                } else {
-                    throw new Error('Submission failed');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showToast('✅ Entry submitted! Check your Google Sheet.');
-                document.getElementById('sadhanaForm').reset();
-                document.getElementById('date').valueAsDate = new Date();
-                selectedMood = '';
-                document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
-                setTimeout(() => openDashboard(), 1500);
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Submit';
-            }
-        });
-        function openDashboard() {
-            document.getElementById('dashboardModal').classList.add('active');
-            loadDashboard();
-        }
-        function closeDashboard() {
-            document.getElementById('dashboardModal').classList.remove('active');
-        }
-        async function loadDashboard() {
-            const container = document.getElementById('entriesContainer');
-            container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading entries...</p></div>';
-            try {
-                const response = await fetch(SCRIPT_URL + '?action=getData');
-                const data = await response.json();
-                if (data.entries && data.entries.length > 0) {
-                    allEntries = data.entries;
-                    displayEntries(allEntries);
-                    updateStats(allEntries);
-                } else {
-                    container.innerHTML = '<div class="loading"><p>No entries yet. Submit your first entry!</p></div>';
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                container.innerHTML = '<div class="loading"><p>Unable to load entries. Please try again.</p></div>';
-            }
-        }
-        function displayEntries(entries) {
-            const container = document.getElementById('entriesContainer');
-            if (entries.length === 0) {
-                container.innerHTML = '<div class="loading"><p>No entries found.</p></div>';
-                return;
-            }
-            container.innerHTML = '<div class="entries-list">' + 
-                entries.map(entry => `
-                    <div class="entry-card">
-                        <div class="entry-header">
-                            <div><div class="entry-date">${formatDate(entry.date)}</div><div class="entry-name">${entry.name}</div></div>
-                            <div style="text-align: right;"><div style="font-weight: 600; color: var(--accent);">${entry.rounds} Rounds</div>
-                            ${entry.mood ? `<div style="font-size: 0.85rem; color: var(--text-light); margin-top: 4px;">${entry.mood}</div>` : ''}</div>
+                
+                alert('Sadhana submitted successfully! 🙏');
+            };
+
+            const getFilteredData = () => {
+                if (currentUser.role === 'admin') return sadhanaData;
+                return sadhanaData.filter(entry => entry.username === currentUser.username);
+            };
+
+            const getChartData = () => {
+                const filtered = getFilteredData();
+                const grouped = filtered.reduce((acc, entry) => {
+                    const date = entry.date;
+                    if (!acc[date]) {
+                        acc[date] = { date, japaRounds: 0, reading: 0 };
+                    }
+                    acc[date].japaRounds += parseInt(entry.japaRounds) || 0;
+                    acc[date].reading += parseInt(entry.reading) || 0;
+                    return acc;
+                }, {});
+
+                return Object.values(grouped)
+                    .sort((a, b) => new Date(a.date) - new Date(b.date))
+                    .slice(-7);
+            };
+
+            const getStats = () => {
+                const filtered = getFilteredData();
+                return {
+                    totalEntries: filtered.length,
+                    totalJapa: filtered.reduce((sum, e) => sum + (parseInt(e.japaRounds) || 0), 0),
+                    totalReading: filtered.reduce((sum, e) => sum + (parseInt(e.reading) || 0), 0),
+                    attendance: filtered.filter(e => e.attendance).length,
+                    uniqueDevotees: currentUser.role === 'admin' 
+                        ? new Set(filtered.map(e => e.username)).size 
+                        : 1
+                };
+            };
+
+            const getMentorStats = () => {
+                if (currentUser.role !== 'admin') return [];
+                
+                const mentorGroups = sadhanaData.reduce((acc, entry) => {
+                    const mentor = entry.mentor || 'Not Selected';
+                    if (!acc[mentor]) {
+                        acc[mentor] = { mentor, devotees: new Set(), entries: 0, totalJapa: 0 };
+                    }
+                    acc[mentor].devotees.add(entry.username);
+                    acc[mentor].entries += 1;
+                    acc[mentor].totalJapa += parseInt(entry.japaRounds) || 0;
+                    return acc;
+                }, {});
+
+                return Object.values(mentorGroups).map(group => ({
+                    ...group,
+                    devotees: group.devotees.size
+                }));
+            };
+
+            // Registration Screen
+            if (showRegister) {
+                return (
+                    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+                            <div className="text-center mb-8">
+                                <div className="inline-block p-3 bg-orange-100 rounded-full mb-4">
+                                    <UserPlus className="w-12 h-12 text-orange-600" />
+                                </div>
+                                <h1 className="text-3xl font-bold text-gray-800">Register as Devotee</h1>
+                                <p className="text-gray-600 mt-2">Create your account to track sadhana</p>
+                            </div>
+                            
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+                                    <input
+                                        type="text"
+                                        value={registerForm.name}
+                                        onChange={(e) => setRegisterForm({...registerForm, name: e.target.value})}
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                        placeholder="e.g., Radha Krishna Das"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Username *</label>
+                                    <input
+                                        type="text"
+                                        value={registerForm.username}
+                                        onChange={(e) => setRegisterForm({...registerForm, username: e.target.value.toLowerCase().replace(/\s/g, '')})}
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                        placeholder="e.g., radhakrishna"
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">No spaces, lowercase only</p>
+                                </div>
+                                
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Password *</label>
+                                    <input
+                                        type="password"
+                                        value={registerForm.password}
+                                        onChange={(e) => setRegisterForm({...registerForm, password: e.target.value})}
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                        placeholder="Create a password"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password *</label>
+                                    <input
+                                        type="password"
+                                        value={registerForm.confirmPassword}
+                                        onChange={(e) => setRegisterForm({...registerForm, confirmPassword: e.target.value})}
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                        placeholder="Re-enter password"
+                                    />
+                                </div>
+                                
+                                <button
+                                    onClick={handleRegister}
+                                    className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-3 rounded-lg font-semibold hover:from-orange-600 hover:to-yellow-600 transition-all shadow-lg"
+                                >
+                                    Register
+                                </button>
+
+                                <button
+                                    onClick={() => setShowRegister(false)}
+                                    className="w-full text-gray-600 hover:text-gray-800 py-2"
+                                >
+                                    ← Back to Login
+                                </button>
+                            </div>
                         </div>
-                        <div class="entry-details">
-                            ${entry.mobile ? `<div class="detail-item"><span class="detail-label">Mobile:</span> <span class="detail-value">${entry.mobile}</span></div>` : ''}
-                            ${entry.sleepTime ? `<div class="detail-item"><span class="detail-label">Sleep:</span> <span class="detail-value">${entry.sleepTime}</span></div>` : ''}
-                            ${entry.wakeTime ? `<div class="detail-item"><span class="detail-label">Wake:</span> <span class="detail-value">${entry.wakeTime}</span></div>` : ''}
-                            ${entry.chantEndTime ? `<div class="detail-item"><span class="detail-label">Chant End:</span> <span class="detail-value">${entry.chantEndTime}</span></div>` : ''}
-                            ${entry.exercise ? `<div class="detail-item"><span class="detail-label">Exercise:</span> <span class="detail-value">${entry.exercise} min</span></div>` : ''}
-                            ${entry.rest ? `<div class="detail-item"><span class="detail-label">Rest:</span> <span class="detail-value">${entry.rest} min</span></div>` : ''}
-                            ${entry.hearingTopic ? `<div class="detail-item"><span class="detail-label">Hearing:</span> <span class="detail-value">${entry.hearingTopic} (${entry.hearingMin || 0} min)</span></div>` : ''}
-                            ${entry.readingTopic ? `<div class="detail-item"><span class="detail-label">Reading:</span> <span class="detail-value">${entry.readingTopic} (${entry.readingMin || 0} min)</span></div>` : ''}
-                            ${entry.seva ? `<div class="detail-item"><span class="detail-label">Seva:</span> <span class="detail-value">${entry.seva} (${entry.sevaMin || 0} min)</span></div>` : ''}
-                            ${entry.positiveChetna ? `<div class="detail-item"><span class="detail-label">Positive:</span> <span class="detail-value">${entry.positiveChetna}</span></div>` : ''}
-                            ${entry.negativeChetna ? `<div class="detail-item"><span class="detail-label">Negative:</span> <span class="detail-value">${entry.negativeChetna}</span></div>` : ''}
-                        </div>
-                        ${entry.notes ? `<div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 0.9rem; color: var(--text-light);">${entry.notes}</div>` : ''}
                     </div>
-                `).join('') +
-            '</div>';
-        }
-        function updateStats(entries) {
-            const totalEntries = entries.length;
-            const totalRounds = entries.reduce((sum, entry) => sum + (parseInt(entry.rounds) || 0), 0);
-            const avgRounds = totalEntries > 0 ? Math.round(totalRounds / totalEntries) : 0;
-            const sortedDates = entries.map(e => new Date(e.date)).sort((a, b) => b - a);
-            let streak = 0, currentDate = new Date();
-            currentDate.setHours(0, 0, 0, 0);
-            for (let date of sortedDates) {
-                date.setHours(0, 0, 0, 0);
-                const diffDays = Math.floor((currentDate - date) / (1000 * 60 * 60 * 24));
-                if (diffDays === streak) { streak++; currentDate = new Date(date); } else { break; }
+                );
             }
-            document.getElementById('totalEntries').textContent = totalEntries;
-            document.getElementById('totalRounds').textContent = totalRounds;
-            document.getElementById('avgRounds').textContent = avgRounds;
-            document.getElementById('currentStreak').textContent = streak;
-        }
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
-        }
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-        document.getElementById('dashboardModal').addEventListener('click', function(e) {
-            if (e.target === this) closeDashboard();
-        });
+
+            // Mentor Selection Screen
+            if (showMentorSelection) {
+                return (
+                    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-2xl">
+                            <div className="text-center mb-8">
+                                <div className="inline-block p-3 bg-orange-100 rounded-full mb-4">
+                                    <UserCircle className="w-12 h-12 text-orange-600" />
+                                </div>
+                                <h1 className="text-3xl font-bold text-gray-800">Select Your Mentor</h1>
+                                <p className="text-gray-600 mt-2">Choose your spiritual guide to continue</p>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {MENTOR_LIST.map((mentor) => (
+                                    <button
+                                        key={mentor}
+                                        onClick={() => handleMentorSelection(mentor)}
+                                        className="p-4 border-2 border-gray-200 rounded-xl hover:border-orange-500 hover:bg-orange-50 transition-all text-left group"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-yellow-400 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                                                {mentor.charAt(0)}
+                                            </div>
+                                            <div>
+                                                <p className="font-semibold text-gray-800 group-hover:text-orange-600 transition-colors">
+                                                    {mentor}
+                                                </p>
+                                                <p className="text-xs text-gray-500">Tap to select</p>
+                                            </div>
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+
+                            <button onClick={handleLogout} className="mt-6 w-full text-gray-600 hover:text-gray-800 py-2">
+                                ← Back to Login
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            // Login Screen
+            if (!currentUser) {
+                return (
+                    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+                            <div className="text-center mb-8">
+                                <div className="inline-block p-3 bg-orange-100 rounded-full mb-4">
+                                    <User className="w-12 h-12 text-orange-600" />
+                                </div>
+                                <h1 className="text-3xl font-bold text-gray-800">Sadhana Tracker</h1>
+                                <p className="text-gray-600 mt-2">Track your spiritual progress</p>
+                            </div>
+                            
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                                    <div className="relative">
+                                        <User className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                                        <input
+                                            type="text"
+                                            value={loginForm.username}
+                                            onChange={(e) => setLoginForm({...loginForm, username: e.target.value})}
+                                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                            placeholder="Enter username"
+                                        />
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                                    <div className="relative">
+                                        <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                                        <input
+                                            type="password"
+                                            value={loginForm.password}
+                                            onChange={(e) => setLoginForm({...loginForm, password: e.target.value})}
+                                            onKeyPress={(e) => e.key === 'Enter' && handleLogin(e)}
+                                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                            placeholder="Enter password"
+                                        />
+                                    </div>
+                                </div>
+                                
+                                <button
+                                    onClick={handleLogin}
+                                    className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-3 rounded-lg font-semibold hover:from-orange-600 hover:to-yellow-600 transition-all shadow-lg"
+                                >
+                                    Login
+                                </button>
+
+                                <div className="text-center">
+                                    <p className="text-sm text-gray-600">Don't have an account?</p>
+                                    <button
+                                        onClick={() => setShowRegister(true)}
+                                        className="mt-2 text-orange-600 font-semibold hover:text-orange-700"
+                                    >
+                                        Register as Devotee
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                                <p className="text-xs text-blue-800 font-semibold mb-2">For Admin Access:</p>
+                                <p className="text-xs text-blue-700">Contact temple administrator</p>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            const stats = getStats();
+            const chartData = getChartData();
+            const mentorStats = getMentorStats();
+
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50">
+                    <div className="bg-white shadow-md">
+                        <div className="max-w-7xl mx-auto px-4 py-4">
+                            <div className="flex justify-between items-center flex-wrap gap-4">
+                                <div>
+                                    <h1 className="text-2xl font-bold text-gray-800">Sadhana Dashboard</h1>
+                                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                        <p className="text-sm text-gray-600">
+                                            Welcome, {currentUser.name} 
+                                            <span className="ml-2 px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-xs font-semibold">
+                                                {currentUser.role === 'admin' ? 'Admin' : 'Devotee'}
+                                            </span>
+                                        </p>
+                                        {currentUser.role === 'devotee' && userProfiles[currentUser.username] && (
+                                            <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-semibold flex items-center gap-1">
+                                                <UserCircle className="w-3 h-3" />
+                                                Mentor: {userProfiles[currentUser.username].mentor}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="flex gap-2">
+                                    {currentUser.role === 'devotee' && (
+                                        <button
+                                            onClick={() => setShowMentorSelection(true)}
+                                            className="flex items-center gap-2 px-3 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors text-sm"
+                                        >
+                                            <UserCircle className="w-4 h-4" />
+                                            Change Mentor
+                                        </button>
+                                    )}
+                                    <button
+                                        onClick={handleLogout}
+                                        className="flex items-center gap-2 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm"
+                                    >
+                                        <LogOut className="w-4 h-4" />
+                                        Logout
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="max-w-7xl mx-auto px-4 py-8">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
+                            <div className="bg-white rounded-xl shadow-lg p-4 md:p-6">
+                                <div className="flex flex-col md:flex-row items-center justify-between">
+                                    <div>
+                                        <p className="text-gray-600 text-xs md:text-sm">Reading (mins)</p>
+                                        <p className="text-2xl md:text-3xl font-bold text-gray-800">{stats.totalReading}</p>
+                                    </div>
+                                    <TrendingUp className="w-8 h-8 md:w-12 md:h-12 text-green-500 mt-2 md:mt-0" />
+                                </div>
+                            </div>
+                            
+                            <div className="bg-white rounded-xl shadow-lg p-4 md:p-6">
+                                <div className="flex flex-col md:flex-row items-center justify-between">
+                                    <div>
+                                        <p className="text-gray-600 text-xs md:text-sm">
+                                            {currentUser.role === 'admin' ? 'Active' : 'Attend'}
+                                        </p>
+                                        <p className="text-2xl md:text-3xl font-bold text-gray-800">
+                                            {currentUser.role === 'admin' ? stats.uniqueDevotees : stats.attendance}
+                                        </p>
+                                    </div>
+                                    <Users className="w-8 h-8 md:w-12 md:h-12 text-purple-500 mt-2 md:mt-0" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {currentUser.role === 'admin' && mentorStats.length > 0 && (
+                            <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+                                <h3 className="text-xl font-semibold text-gray-800 mb-4">Mentor-wise Statistics</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {mentorStats.map((stat) => (
+                                        <div key={stat.mentor} className="border border-gray-200 rounded-lg p-4 hover:border-orange-500 transition-colors">
+                                            <div className="flex items-start gap-3">
+                                                <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white font-bold">
+                                                    {stat.mentor.charAt(0)}
+                                                </div>
+                                                <div className="flex-1">
+                                                    <p className="font-semibold text-gray-800 text-sm">{stat.mentor}</p>
+                                                    <div className="mt-2 space-y-1">
+                                                        <p className="text-xs text-gray-600">Devotees: <span className="font-semibold">{stat.devotees}</span></p>
+                                                        <p className="text-xs text-gray-600">Entries: <span className="font-semibold">{stat.entries}</span></p>
+                                                        <p className="text-xs text-gray-600">Total Japa: <span className="font-semibold">{stat.totalJapa}</span></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                            <div className="bg-white rounded-xl shadow-lg p-6">
+                                <h3 className="text-lg font-semibold text-gray-800 mb-4">Japa Progress (Last 7 Days)</h3>
+                                <ResponsiveContainer width="100%" height={250}>
+                                    <LineChart data={chartData}>
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis dataKey="date" />
+                                        <YAxis />
+                                        <Tooltip />
+                                        <Legend />
+                                        <Line type="monotone" dataKey="japaRounds" stroke="#f97316" strokeWidth={2} name="Japa Rounds" />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </div>
+                            
+                            <div className="bg-white rounded-xl shadow-lg p-6">
+                                <h3 className="text-lg font-semibold text-gray-800 mb-4">Reading Progress (Last 7 Days)</h3>
+                                <ResponsiveContainer width="100%" height={250}>
+                                    <BarChart data={chartData}>
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis dataKey="date" />
+                                        <YAxis />
+                                        <Tooltip />
+                                        <Legend />
+                                        <Bar dataKey="reading" fill="#10b981" name="Reading (mins)" />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+
+                        {currentUser.role === 'devotee' && (
+                            <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+                                <h3 className="text-xl font-semibold text-gray-800 mb-6">Submit Today's Sadhana</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                                        <input
+                                            type="date"
+                                            value={sadhanaForm.date}
+                                            onChange={(e) => setSadhanaForm({...sadhanaForm, date: e.target.value})}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                                        />
+                                    </div>
+                                    
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Japa Rounds *</label>
+                                        <input
+                                            type="number"
+                                            value={sadhanaForm.japaRounds}
+                                            onChange={(e) => setSadhanaForm({...sadhanaForm, japaRounds: e.target.value})}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                                            placeholder="16"
+                                        />
+                                    </div>
+                                    
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Reading (minutes) *</label>
+                                        <input
+                                            type="number"
+                                            value={sadhanaForm.reading}
+                                            onChange={(e) => setSadhanaForm({...sadhanaForm, reading: e.target.value})}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                                            placeholder="30"
+                                        />
+                                    </div>
+                                    
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Service (optional)</label>
+                                        <input
+                                            type="text"
+                                            value={sadhanaForm.service}
+                                            onChange={(e) => setSadhanaForm({...sadhanaForm, service: e.target.value})}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                                            placeholder="Temple cleaning"
+                                        />
+                                    </div>
+                                    
+                                    <div className="flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            id="attendance"
+                                            checked={sadhanaForm.attendance}
+                                            onChange={(e) => setSadhanaForm({...sadhanaForm, attendance: e.target.checked})}
+                                            className="w-5 h-5 text-orange-500 rounded focus:ring-2 focus:ring-orange-500"
+                                        />
+                                        <label htmlFor="attendance" className="ml-2 text-sm font-medium text-gray-700">
+                                            Temple Attendance
+                                        </label>
+                                    </div>
+                                    
+                                    <div className="md:col-span-2">
+                                        <button
+                                            onClick={handleSadhanaSubmit}
+                                            className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-3 rounded-lg font-semibold hover:from-orange-600 hover:to-yellow-600 transition-all shadow-lg"
+                                        >
+                                            Submit Sadhana
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="bg-white rounded-xl shadow-lg p-6">
+                            <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                                {currentUser.role === 'admin' ? 'All Devotees Sadhana Records' : 'Your Sadhana Records'}
+                            </h3>
+                            <div className="overflow-x-auto">
+                                <table className="w-full">
+                                    <thead className="bg-gray-50">
+                                        <tr>
+                                            {currentUser.role === 'admin' && (
+                                                <>
+                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Devotee</th>
+                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mentor</th>
+                                                </>
+                                            )}
+                                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Japa</th>
+                                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reading</th>
+                                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Service</th>
+                                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Attend</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-200">
+                                        {getFilteredData().sort((a, b) => new Date(b.date) - new Date(a.date)).map((entry) => (
+                                            <tr key={entry.id} className="hover:bg-gray-50">
+                                                {currentUser.role === 'admin' && (
+                                                    <>
+                                                        <td className="px-4 py-3 text-sm text-gray-900">{entry.devotee}</td>
+                                                        <td className="px-4 py-3 text-sm">
+                                                            <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-semibold">
+                                                                {entry.mentor}
+                                                            </span>
+                                                        </td>
+                                                    </>
+                                                )}
+                                                <td className="px-4 py-3 text-sm text-gray-900">{entry.date}</td>
+                                                <td className="px-4 py-3 text-sm text-gray-900">{entry.japaRounds}</td>
+                                                <td className="px-4 py-3 text-sm text-gray-900">{entry.reading}m</td>
+                                                <td className="px-4 py-3 text-sm text-gray-900">{entry.service || '-'}</td>
+                                                <td className="px-4 py-3 text-sm">
+                                                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                                                        entry.attendance ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                                    }`}>
+                                                        {entry.attendance ? 'Yes' : 'No'}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                                {getFilteredData().length === 0 && (
+                                    <p className="text-center text-gray-500 py-8">No sadhana records yet</p>
+                                )}
+                            </div>
+                        </div>
+
+                        {currentUser.role === 'admin' && (
+                            <div className="bg-blue-50 rounded-xl p-6 mt-8">
+                                <h4 className="font-semibold text-blue-900 mb-2">📊 Total Registered Devotees: {Object.keys(devoteeAccounts).length}</h4>
+                                <p className="text-sm text-blue-700">Devotees can self-register from the login page.</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<SadhanaTracker />, document.getElementById('root'));
     </script>
 </body>
-</html>
+</html>text-xs md:text-sm">Total Entries</p>
+                                        <p className="text-2xl md:text-3xl font-bold text-gray-800">{stats.totalEntries}</p>
+                                    </div>
+                                    <Calendar className="w-8 h-8 md:w-12 md:h-12 text-blue-500 mt-2 md:mt-0" />
+                                </div>
+                            </div>
+                            
+                            <div className="bg-white rounded-xl shadow-lg p-4 md:p-6">
+                                <div className="flex flex-col md:flex-row items-center justify-between">
+                                    <div>
+                                        <p className="text-gray-600 text-xs md:text-sm">Total Japa</p>
+                                        <p className="text-2xl md:text-3xl font-bold text-gray-800">{stats.totalJapa}</p>
+                                    </div>
+                                    <Award className="w-8 h-8 md:w-12 md:h-12 text-orange-500 mt-2 md:mt-0" />
+                                </div>
+                            </div>
+                            
+                            <div className="bg-white rounded-xl shadow-lg p-4 md:p-6">
+                                <div className="flex flex-col md:flex-row items-center justify-between">
+                                    <div>
+                                        <p className="text-gray-600
